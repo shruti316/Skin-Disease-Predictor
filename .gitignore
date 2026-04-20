@@ -222,9 +222,7 @@ ENV/
 .env.*
 *.env
 
-# Jupyter
-.ipynb_checkpoints/
-*.ipynb
+
 
 # Python packaging
 build/
@@ -309,3 +307,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+
+.ipynb_checkpoints/
