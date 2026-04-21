@@ -310,3 +310,20 @@ Thumbs.db
 
 
 .ipynb_checkpoints/
+
+# React frontend
+frontend-react/node_modules/
+frontend-react/.env
+frontend-react/dist/
+
+# Node modules anywhere
+node_modules/
+
+# Frontend
+frontend-react/node_modules/
+frontend-react/dist/
+frontend-react/.env
+
+# Node
+node_modules/
+dist/
