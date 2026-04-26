@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 200 40% 99%;
+    --foreground: 210 40% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 40% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 40% 12%;
+
+    /* Medical blue */
+    --primary: 205 90% 48%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 195 95% 60%;
+
+    /* Teal */
+    --secondary: 178 70% 41%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 200 30% 96%;
+    --muted-foreground: 210 15% 45%;
+
+    /* Soft green accent */
+    --accent: 158 64% 52%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 210 25% 90%;
+    --input: 210 25% 92%;
+    --ring: 205 90% 48%;
+
+    --radius: 1rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(205 90% 96%) 0%, hsl(178 70% 94%) 50%, hsl(158 64% 95%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(205 90% 48%) 0%, hsl(178 70% 45%) 100%);
+    --gradient-glow: radial-gradient(ellipse at top, hsl(195 95% 60% / 0.25), transparent 60%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100% / 0.9), hsl(200 40% 98% / 0.7));
+    --gradient-heatmap: linear-gradient(135deg, hsl(220 80% 50%) 0%, hsl(178 70% 50%) 25%, hsl(60 95% 55%) 55%, hsl(25 95% 55%) 80%, hsl(0 90% 55%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(205 50% 50% / 0.1);
+    --shadow-elegant: 0 20px 50px -20px hsl(205 80% 40% / 0.25);
+    --shadow-glow: 0 0 60px hsl(195 95% 60% / 0.4);
+    --shadow-card: 0 8px 30px -8px hsl(210 40% 30% / 0.08);
+
+    /* Glass */
+    --glass-bg: hsl(0 0% 100% / 0.7);
+    --glass-border: hsl(0 0% 100% / 0.5);
+
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 210 40% 6%;
+    --foreground: 200 40% 98%;
+    --card: 210 35% 10%;
+    --card-foreground: 200 40% 98%;
+    --popover: 210 35% 10%;
+    --popover-foreground: 200 40% 98%;
+    --primary: 195 95% 60%;
+    --primary-foreground: 210 40% 8%;
+    --secondary: 178 70% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 30% 15%;
+    --muted-foreground: 210 15% 65%;
+    --accent: 158 64% 52%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 30% 18%;
+    --input: 210 30% 18%;
+    --ring: 195 95% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+  }
+  .glass-card {
+    @apply glass rounded-2xl;
+    box-shadow: var(--shadow-card);
+  }
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-elegant);
+  }
+  .heatmap-gradient {
+    background: var(--gradient-heatmap);
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
