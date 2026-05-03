@@ -1,7 +1,9 @@
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from core.predictor import predict_skin_disease
-from core.schemas import PredictResponse
+from core.predictor import predict
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -28,28 +30,35 @@ def diseases():
     }
 
 
-@router.post("/api/predict", response_model=PredictResponse)
-async def predict(
-    image: UploadFile = File(...),
-    age: int = Form(...),
-    gender: str = Form(...),
-    symptoms: str = Form(...)
+@router.post("/predict")
+async def predict_endpoint(
+    file: UploadFile = File(...)
 ):
     try:
-        image_bytes = await image.read()
+        logger.info(f"Received request to /predict. File name: {file.filename}, Content type: {file.content_type}")
+        
+        if not file:
+            raise HTTPException(status_code=400, detail="No file uploaded")
+            
+        if not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
 
-        result = predict_skin_disease(
-            image_bytes=image_bytes,
-            age=age,
-            gender=gender,
-            symptoms=symptoms
-        )
+        image_bytes = await file.read()
+        logger.info("Starting model inference")
 
-        return {
-            "success": True,
-            "message": "Prediction completed successfully",
-            "result": result
+        label, confidence, probabilities = predict(image_bytes)
+
+        response = {
+            "prediction": label,
+            "confidence": confidence,
+            "probabilities": probabilities
         }
+        logger.info(f"Sending response: {response}")
+        return response
 
+    except HTTPException as he:
+        logger.error(f"HTTPException: {str(he)}")
+        raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Internal Error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Backend failure during prediction")

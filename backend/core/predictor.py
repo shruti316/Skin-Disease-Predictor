@@ -90,37 +90,31 @@ transform = transforms.Compose([
 # -------------------------------------------------
 # Prediction Function
 # -------------------------------------------------
-def predict_skin_disease(image_bytes, age, gender, symptoms):
+def predict(image_bytes):
+    try:
+        # Preprocess
+        image = Image.open(BytesIO(image_bytes)).convert("RGB")
+        image = transform(image).unsqueeze(0).to(device)
 
-    image = Image.open(BytesIO(image_bytes)).convert("RGB")
-    image = transform(image).unsqueeze(0).to(device)
+        # Model inference
+        with torch.no_grad():
+            disease_out, severity_out = model(image)
+            disease_probs = torch.softmax(disease_out, dim=1)
+            confidence, predicted_idx = torch.max(disease_probs, dim=1)
+            
+            # Get top 5 probabilities
+            top5_probs, top5_idx = torch.topk(disease_probs, min(5, disease_probs.size(1)))
 
-    with torch.no_grad():
-        disease_out, severity_out = model(image)
+        label = CLASS_NAMES[predicted_idx.item()]
+        confidence_score = round(confidence.item() * 100, 2)
+        
+        probabilities = []
+        for i in range(top5_probs.size(1)):
+            prob = float(top5_probs[0][i]) * 100
+            name = CLASS_NAMES[top5_idx[0][i].item()]
+            probabilities.append({"name": name, "value": round(prob, 2)})
 
-        disease_probs = torch.softmax(disease_out, dim=1)
-        confidence, predicted_idx = torch.max(disease_probs, dim=1)
-
-        severity_idx = torch.argmax(severity_out, dim=1).item()
-
-    disease_name = CLASS_NAMES[predicted_idx.item()]
-    confidence_score = round(confidence.item() * 100, 2)
-
-    severity_labels = ["Mild", "Moderate", "Severe"]
-    severity = severity_labels[severity_idx]
-
-    recommendations = [
-        "Keep affected area clean",
-        "Avoid self-medication",
-        "Consult dermatologist/veterinarian if symptoms persist"
-    ]
-
-    if confidence_score < 60:
-        recommendations.append("Low confidence prediction. Professional diagnosis recommended.")
-
-    return {
-        "disease": disease_name,
-        "confidence": confidence_score,
-        "recommendations": recommendations,
-        "severity": severity
-    }
+        return label, confidence_score, probabilities
+    except Exception as e:
+        print(f"Error during prediction: {str(e)}")
+        raise e

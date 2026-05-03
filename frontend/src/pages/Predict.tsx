@@ -43,15 +43,42 @@ const Predict = () => {
   const [payload, setPayload] = useState<PredictPayload | null>(null);
   const [result, setResult] = useState<PredictionResult | null>(null);
 
-  const handleSubmit = (p: PredictPayload) => {
-    setPayload(p);
-    setStage("loading");
-    // placeholder for real /predict API call
-    setTimeout(() => {
-      setResult(fakePredict(p.category));
-      setStage("result");
-    }, 2400);
-  };
+const handleSubmit = async (p: PredictPayload) => {
+  setPayload(p);
+  setStage("loading");
+
+  try {
+    const formData = new FormData();
+    formData.append("file", p.image); 
+
+    const response = await fetch("http://localhost:8000/predict", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.detail || "Failed to process image");
+    }
+
+    const data = await response.json();
+    console.log("BACKEND RESULT:", data);
+
+    setResult({
+      topClass: data.prediction,
+      confidence: data.confidence,
+      description: p.category === "human" ? "Human skin condition detected." : "Animal skin condition detected.",
+      probabilities: data.probabilities || [],
+    });
+
+    setStage("result");
+
+  } catch (error: any) {
+    console.error("ERROR:", error);
+    alert(error.message || "Backend connection failed");
+    setStage("form");
+  }
+};
 
   const reset = () => { setStage("select"); setPayload(null); setResult(null); };
 

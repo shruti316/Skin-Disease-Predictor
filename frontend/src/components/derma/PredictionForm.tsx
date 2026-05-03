@@ -5,11 +5,12 @@ import { toast } from "sonner";
 export type PredictPayload = {
   category: "human" | "animal";
   name?: string;
-  age: string;
+  age?: number;
   gender?: string;
   animalType?: string;
   symptoms: string;
-  imageUrl: string;
+  imageUrl?: string;
+  image: File; // 🔥 ADD THIS
 };
 
 const HUMAN_SYMPTOMS = ["Itching", "Redness", "Scaling", "Blisters", "Dryness", "Swelling", "Pain", "Discoloration"];
@@ -23,25 +24,29 @@ const PredictionForm = ({ category, onSubmit }: { category: "human" | "animal"; 
   const [animalType, setAnimalType] = useState("dog");
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [extra, setExtra] = useState("");
+  const [image, setImage] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [drag, setDrag] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file?: File | null) => {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please upload an image file.");
-      return;
-    }
-    setImageUrl(URL.createObjectURL(file));
-  };
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    toast.error("Please upload an image file.");
+    return;
+  }
+
+  setImage(file); // ✅ IMPORTANT FIX
+  setImageUrl(URL.createObjectURL(file));
+};
 
   const toggleSymptom = (s: string) =>
     setSymptoms((arr) => (arr.includes(s) ? arr.filter((x) => x !== s) : [...arr, s]));
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imageUrl) {
+    if (!image) {
       toast.error("Please upload an image first.");
       return;
     }
@@ -49,14 +54,16 @@ const PredictionForm = ({ category, onSubmit }: { category: "human" | "animal"; 
       toast.error("Age is required.");
       return;
     }
+
     onSubmit({
       category,
       name: name || undefined,
-      age,
+      age: Number(age) || undefined,
       gender: isHuman ? gender : undefined,
       animalType: !isHuman ? animalType : undefined,
       symptoms: [...symptoms, extra].filter(Boolean).join(", "),
       imageUrl,
+      image, // 🔥 THIS FIXES EVERYTHING
     });
   };
 
